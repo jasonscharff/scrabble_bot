@@ -31,11 +31,11 @@ class Board:
     def is_valid_play(self, word, starting_coordinate, direction):
         return True
 
+    def points_earned_for(self, word, starting_coordinate, direction):
+        return 1
+
     def play(self, word, starting_coordinate, direction):
         pass
-
-
-
 
     class Direction(Enum):
         HORIZONTAL = 0
@@ -53,8 +53,3 @@ class Board:
         def __init__(self, space_type=SpaceType.REGULAR, letter=None):
             self.space_type = space_type
             self.letter = letter
-
-
-if __name__ == '__main__':
-    b = Board()
-    print(b)

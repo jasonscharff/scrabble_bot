@@ -16,7 +16,7 @@ class TileBag:
         self.tiles = self.__generate_tiles()
 
     def draw(self, number):
-        return self.tiles.pop(number)
+        return [self.tiles.pop() for _ in range(number)]
 
     def __generate_tiles(self):
         all_tiles = []
