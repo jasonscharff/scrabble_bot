@@ -28,8 +28,8 @@ class Board:
         return '\n'.join(all_rows)
 
 
-    def is_valid_play(self, word, starting_coordinate, direction)
-        pass
+    def is_valid_play(self, word, starting_coordinate, direction):
+        return True
 
     def play(self, word, starting_coordinate, direction):
         pass

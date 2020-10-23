@@ -44,39 +44,51 @@ class GADDAG:
 
 
     def find_matches(self, hook, rack, available_prefix_spaces, available_suffix_spaces):
-        if hook not in self.root.children:
+        if hook is None or len(hook) == 0:
+            parent = self.root
+        elif hook not in self.root.children:
             return []
-        return self.__find_matches(self.root.children[hook], rack, available_prefix_spaces, available_suffix_spaces, [hook], True)
+        else:
+            parent = self.root.children[hook]
+
+        return self.__find_matches(parent, rack, available_prefix_spaces, available_suffix_spaces, [], [], True)
 
 
-    def __find_matches(self, parent_node, rack, available_prefix_spaces, available_suffix_spaces, current_letters, is_prepending):
+    def __find_matches(self, parent_node, rack, available_prefix_spaces, available_suffix_spaces, current_prefix_letters, current_suffix_letters, is_prepending):
         if is_prepending and available_prefix_spaces < 0 or not is_prepending and available_suffix_spaces < 0:
             return []
 
         words_in_branch = []
         for candidate in parent_node.children:
             if candidate == GADDAG.Node.NodeType.EOW:
-                words_in_branch.append(''.join(current_letters))
+                words_in_branch.append(
+                    (
+                        ''.join(current_prefix_letters),
+                        ''.join(current_suffix_letters)
+                    )
+                )
             elif candidate == GADDAG.Node.NodeType.BREAK:
-                words_in_branch += self.__find_matches(parent_node.children[candidate], rack, available_prefix_spaces, available_suffix_spaces, current_letters, False)
+                words_in_branch += self.__find_matches(parent_node.children[candidate], rack, available_prefix_spaces, available_suffix_spaces, current_prefix_letters, current_suffix_letters, False)
             elif candidate in rack:
-                new_current_letters = list(current_letters)
                 if is_prepending:
+                    new_current_prefix_letters = list(current_prefix_letters)
+                    new_current_suffix_letters = current_suffix_letters
                     next_available_prefix_spaces = available_prefix_spaces -1
                     next_available_suffix_spaces = available_suffix_spaces
-                    new_current_letters.insert(0, candidate)
+                    new_current_prefix_letters.insert(0, candidate)
                 else:
+                    new_current_prefix_letters = current_prefix_letters
+                    new_current_suffix_letters = list(current_suffix_letters)
                     next_available_prefix_spaces = available_prefix_spaces
                     next_available_suffix_spaces = available_suffix_spaces - 1
-                    new_current_letters.append(candidate)
+                    new_current_suffix_letters.append(candidate)
 
                 new_rack = list(rack)
                 new_rack.remove(candidate)
 
-                words_in_branch += self.__find_matches(parent_node.children[candidate], new_rack, next_available_prefix_spaces, next_available_suffix_spaces, new_current_letters, is_prepending)
+                words_in_branch += self.__find_matches(parent_node.children[candidate], new_rack, next_available_prefix_spaces, next_available_suffix_spaces, new_current_prefix_letters, new_current_suffix_letters, is_prepending)
 
-        #we need to de-dup as we can run into a situation with duplicate letters traversing different branches
-        return list(set(words_in_branch))
+        return list(words_in_branch)
 
     class Node:
         def __init__(self, content):

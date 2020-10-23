@@ -8,7 +8,7 @@ class GADDAGTests(unittest.TestCase):
 
         self.assertCountEqual(
             g.find_matches(hook='a', rack=['p', 'p', 'l', 'e'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['apple']
+            [('', 'pple')]
         )
 
         self.assertCountEqual(
@@ -18,7 +18,7 @@ class GADDAGTests(unittest.TestCase):
 
         self.assertCountEqual(
             g.find_matches(hook='p', rack=['a', 'p', 'p', 'l', 'e'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['apple']
+            [('a', 'ple'), ('ap', 'le')]
         )
 
         self.assertCountEqual(
@@ -28,7 +28,7 @@ class GADDAGTests(unittest.TestCase):
 
         self.assertCountEqual(
             g.find_matches(hook='l', rack=['a', 'p', 'p', 'l', 'e'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['apple']
+            [('app', 'e')]
         )
 
         self.assertCountEqual(
@@ -38,7 +38,7 @@ class GADDAGTests(unittest.TestCase):
 
         self.assertCountEqual(
             g.find_matches(hook='l', rack=['a', 'p', 'p', 'l', 'e'], available_prefix_spaces=3, available_suffix_spaces=10),
-            ['apple']
+            [('app', 'e')]
         )
 
         self.assertCountEqual(
@@ -48,7 +48,7 @@ class GADDAGTests(unittest.TestCase):
 
         self.assertCountEqual(
             g.find_matches(hook='a', rack=['a', 'p', 'p', 'l', 'e'], available_prefix_spaces=10, available_suffix_spaces=4),
-            ['apple']
+            [('', 'pple')]
         )
 
     def test_multiple_words(self):
@@ -60,32 +60,32 @@ class GADDAGTests(unittest.TestCase):
 
         self.assertCountEqual(
             g.find_matches(hook='a', rack=['c', 't', 'p', 'p', 'l', 'e', 'b'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['cat', 'bat', 'at', 'apple']
+            [('c', 't'), ('b','t'), ('','t'), ('', 'pple')]
         )
 
         self.assertCountEqual(
             g.find_matches(hook='a', rack=['c', 'p', 'p', 'l', 'e', 'b'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['apple']
+            [('', 'pple')]
         )
 
         self.assertCountEqual(
             g.find_matches(hook='a', rack=['c', 'p', 'l', 'e', 'b', 't'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['cat', 'bat', 'at']
+            [('c','t'), ('b', 't'), ('','t')]
         )
 
         self.assertCountEqual(
             g.find_matches(hook='c', rack=['c', 'a', 'p', 'l', 'e', 'b', 't'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['cat']
+            [('', 'at')]
         )
 
         self.assertCountEqual(
             g.find_matches(hook='b', rack=['c', 'a', 'p', 'l', 'e', 'b', 't'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['bat']
+            [('', 'at')]
         )
 
         self.assertCountEqual(
             g.find_matches(hook='t', rack=['c', 'a', 'p', 'l', 'e', 'b', 't'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['bat', 'cat', 'at']
+            [('ba', ''), ('ca', ''), ('a', '')]
         )
 
         self.assertCountEqual(
@@ -95,17 +95,17 @@ class GADDAGTests(unittest.TestCase):
 
         self.assertCountEqual(
             g.find_matches(hook='t', rack=['p', 'a', 'l', 'e', 'b', 't'], available_prefix_spaces=10, available_suffix_spaces=10),
-            ['bat', 'at']
+            [('ba', ''), ('a', '')]
         )
 
         self.assertCountEqual(
             g.find_matches(hook='t', rack=['p', 'a', 'l', 'e', 'b', 't'], available_prefix_spaces=1, available_suffix_spaces=10),
-            ['at']
+            [('a', '')]
         )
 
         self.assertCountEqual(
             g.find_matches(hook='c', rack=['p', 'a', 'l', 'e', 'b', 't'], available_prefix_spaces=10, available_suffix_spaces=2),
-            ['cat']
+            [('', 'at')]
         )
 
         self.assertCountEqual(
@@ -131,7 +131,7 @@ class GADDAGTests(unittest.TestCase):
                 g.add_word(line.strip('\n'))
 
         matches = g.find_matches(hook='A', rack=['P', 'P', 'L', 'E'], available_prefix_spaces=10, available_suffix_spaces=10)
-        self.assertTrue('APPLE' in matches)
+        self.assertTrue(('', 'PPLE') in matches)
 
 
 if __name__ == '__main__':
