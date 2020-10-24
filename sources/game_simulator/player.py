@@ -47,11 +47,94 @@ class AIPlayer(Player):
                  )
             )
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
-        print(best_move)
         board.play(best_move[0], best_move[1], best_move[2])
 
-    def play(self, current_board):
-        pass
+    def play(self, board):
+        rack = list(map(lambda x: x.letter, self.tiles))
+        available_moves = []
+
+        #first let's check horizontally
+        for y, row in enumerate(board.board):
+            previous_letter_index = 0
+            current_prefix_count = 0
+            hook = None
+            for x, space in enumerate(board.board[y]):
+                if space.letter is not None:
+                    if hook is not None:
+                        available_moves += self.__evaluate_moves(
+                            board=board,
+                            rack=rack,
+                            hook=hook,
+                            prefix_length=current_prefix_count,
+                            suffix_length=len(board.board) - x - previous_letter_index - 1
+                        )
+
+                    current_prefix_count = x - previous_letter_index - 1
+                    hook = ((x, y), space.letter)
+
+            if hook is not None:
+                available_moves += self.__evaluate_moves(
+                    board=board,
+                    rack=rack,
+                    hook=hook,
+                    prefix_length=current_prefix_count,
+                    suffix_length=len(board.board) - x - previous_letter_index - 1,
+                    direction=Board.Direction.HORIZONTAL
+                )
+
+        #now we check vertically using the same logic
+        for x in range(board.board[0]):
+            previous_letter_index = 0
+            current_prefix_count = 0
+            hook = None
+            for y in range(board.board):
+                space = board.board[x][y]
+                if space.letter is not None:
+                    if hook is not None:
+                        available_moves += self.__evaluate_moves(
+                            board=board,
+                            rack=rack,
+                            hook=hook,
+                            prefix_length=current_prefix_count,
+                            suffix_length=len(board.board) - x - previous_letter_index - 1,
+                            direction=Board.Direction.VERTICAL
+                        )
+
+                    current_prefix_count = x - previous_letter_index - 1
+                    hook = ((x, y), space.letter)
+
+        best_move, points_earned = max(available_moves, key=lambda x: x[1])
+        board.play(best_move[0], best_move[1], best_move[2])
+
+    def __evaluate_moves(self, board, rack, hook, prefix_length, suffix_length, direction):
+        available_moves = []
+
+        options = self.scrabble_dictionary.find_matches(
+            hook=hook[1],
+            rack=rack,
+            available_prefix_spaces=prefix_length,
+            available_suffix_spaces=suffix_length
+        )
+        for prefix, suffix in options:
+            word = prefix + hook + suffix
+            if direction == Board.Direction.HORIZONTAL:
+                move = (word, (hook[0][0] - len(prefix), hook[0][1]), Board.Direction.HORIZONTAL)
+            else:
+                move = (word, (hook[0][0], hook[0][1] - - len(prefix)), Board.Direction.VERTICAL)
+
+            if board.is_valid_play(move[0], move[1], move[2]):
+                available_moves.append(
+                    (
+                        move,
+                        board.points_earned_for(move[0], move[1], move[2])
+                    )
+                )
+
+        return available_moves
+
+
+
+
 
 
 '''
