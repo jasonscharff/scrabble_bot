@@ -13,7 +13,7 @@ class Player(ABC):
     def play(self, current_board):
         pass
 
-class AIPlayer(Player):
+class GreedyPlayer(Player):
 
     def __init__(self, scrabble_dictionary):
         super().__init__()
@@ -49,78 +49,113 @@ class AIPlayer(Player):
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
 
+
+    def find_horizontal_hooks(self, board):
+        hooks = []
+
+        for x, row in enumerate(board.board):
+            previous_letter_index = -2
+            current_prefix_count = 0
+            hook_coordinates = None
+            hook_letter = None
+            for y, space in enumerate(board.board[x]):
+                if space.letter is not None:
+                    if hook_coordinates is not None:
+                        suffix_count = y - previous_letter_index - 2
+                        if current_prefix_count >= 0 and suffix_count >= 0 and (current_prefix_count > 0 or suffix_count > 0):
+                            hooks.append(
+                                (hook_coordinates, hook_letter, current_prefix_count, suffix_count)
+                            )
+                    current_prefix_count = y - previous_letter_index - 2
+                    previous_letter_index = y
+                    hook_coordinates, hook_letter = (x, y), space.letter
+            y += 1
+            if hook_coordinates is not None:
+                suffix_count = y - previous_letter_index - 1
+                if current_prefix_count >= 0 and suffix_count >= 0 and (current_prefix_count > 0 or suffix_count > 0):
+                    hooks.append(
+                        (hook_coordinates, hook_letter, current_prefix_count, suffix_count)
+                    )
+        return hooks
+
+    def find_vertical_hooks(self, board):
+        hooks = []
+        for y in range(len(board.board[0])):
+            previous_letter_index = -2
+            current_prefix_count = 0
+            hook_coordinates = None
+            hook_letter = None
+            for x in range(len(board.board)):
+                space = board.board[x][y]
+                if space.letter is not None:
+                    if hook_coordinates is not None:
+                        suffix_count = x - previous_letter_index - 2
+                        if current_prefix_count >= 0 and suffix_count >= 0 and (
+                                current_prefix_count > 0 or suffix_count > 0):
+                            hooks.append(
+                                (hook_coordinates, hook_letter, current_prefix_count, suffix_count)
+                            )
+                    current_prefix_count = x - previous_letter_index - 2
+                    previous_letter_index = x
+                    hook_coordinates, hook_letter = (x, y), space.letter
+            x += 1
+            if hook_coordinates is not None:
+                suffix_count = x - previous_letter_index - 1
+                if current_prefix_count >= 0 and suffix_count >= 0 and (current_prefix_count > 0 or suffix_count > 0):
+                    hooks.append(
+                        (hook_coordinates, hook_letter, current_prefix_count, suffix_count)
+                    )
+        return hooks
+
     def play(self, board):
         rack = list(map(lambda x: x.letter, self.tiles))
         available_moves = []
-
-        #first let's check horizontally
-        for y, row in enumerate(board.board):
-            previous_letter_index = 0
-            current_prefix_count = 0
-            hook = None
-            for x, space in enumerate(board.board[y]):
-                if space.letter is not None:
-                    if hook is not None:
-                        available_moves += self.__evaluate_moves(
-                            board=board,
-                            rack=rack,
-                            hook=hook,
-                            prefix_length=current_prefix_count,
-                            suffix_length=len(board.board) - x - previous_letter_index - 1
-                        )
-
-                    current_prefix_count = x - previous_letter_index - 1
-                    hook = ((x, y), space.letter)
-
-            if hook is not None:
-                available_moves += self.__evaluate_moves(
+        available_horizontal_moves = self.find_horizontal_hooks(board)
+        available_vertical_moves = self.find_vertical_hooks(board)
+        for hook_coordinates, hook_letter, prefix_count, suffix_count in available_horizontal_moves:
+            available_moves.append(
+                self.__evaluate_moves(
                     board=board,
                     rack=rack,
-                    hook=hook,
-                    prefix_length=current_prefix_count,
-                    suffix_length=len(board.board) - x - previous_letter_index - 1,
+                    hook_letter=hook_letter,
+                    hook_coordinates=hook_coordinates,
+                    prefix_length=prefix_count,
+                    suffix_length=suffix_count,
                     direction=Board.Direction.HORIZONTAL
                 )
+            )
 
-        #now we check vertically using the same logic
-        for x in range(board.board[0]):
-            previous_letter_index = 0
-            current_prefix_count = 0
-            hook = None
-            for y in range(board.board):
-                space = board.board[x][y]
-                if space.letter is not None:
-                    if hook is not None:
-                        available_moves += self.__evaluate_moves(
-                            board=board,
-                            rack=rack,
-                            hook=hook,
-                            prefix_length=current_prefix_count,
-                            suffix_length=len(board.board) - x - previous_letter_index - 1,
-                            direction=Board.Direction.VERTICAL
-                        )
-
-                    current_prefix_count = x - previous_letter_index - 1
-                    hook = ((x, y), space.letter)
+        for hook_coordinates, hook_letter, prefix_count, suffix_count in available_vertical_moves:
+            available_moves.append(
+                self.__evaluate_moves(
+                    board=board,
+                    rack=rack,
+                    hook_letter=hook_letter,
+                    hook_coordinates=hook_coordinates,
+                    prefix_length=prefix_count,
+                    suffix_length=suffix_count,
+                    direction=Board.Direction.VERTICAL
+                )
+            )
 
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
 
-    def __evaluate_moves(self, board, rack, hook, prefix_length, suffix_length, direction):
+    def __evaluate_moves(self, board, rack, hook_letter, hook_coordinates, prefix_length, suffix_length, direction):
         available_moves = []
 
         options = self.scrabble_dictionary.find_matches(
-            hook=hook[1],
+            hook=hook_letter,
             rack=rack,
             available_prefix_spaces=prefix_length,
             available_suffix_spaces=suffix_length
         )
         for prefix, suffix in options:
-            word = prefix + hook + suffix
+            word = prefix + hook_letter + suffix
             if direction == Board.Direction.HORIZONTAL:
-                move = (word, (hook[0][0] - len(prefix), hook[0][1]), Board.Direction.HORIZONTAL)
+                move = (word, (hook_coordinates[0], hook_coordinates[1] - len(prefix)), Board.Direction.HORIZONTAL)
             else:
-                move = (word, (hook[0][0], hook[0][1] - - len(prefix)), Board.Direction.VERTICAL)
+                move = (word, (hook_coordinates[0] - len(prefix), hook_coordinates[1]), Board.Direction.VERTICAL)
 
             if board.is_valid_play(move[0], move[1], move[2]):
                 available_moves.append(
@@ -131,34 +166,3 @@ class AIPlayer(Player):
                 )
 
         return available_moves
-
-
-
-
-
-
-'''
-#first go through each row
-        for row in current_board.board:
-            spaces_with_tiles = []
-            for index, space in enumerate(row):
-                if space.letter is not None:
-                    spaces_with_tiles.append((index, space.letter))
-            for index, space in enumerate(spaces_with_tiles):
-                space_index, space_letter = space
-                if index == 0:
-                    left_space = space_index
-                else:
-                    left_space = space_index - spaces_with_tiles[index-1][0]
-                if index == len(spaces_with_tiles) - 1:
-                    right_space = len(row) - space_index - 1
-                else:
-                    right_space = spaces_with_tiles[index + 1][0] - space_index
-
-                word_options = g.find_matches(space_letter, self.words, left_space, right_space)
-                #we need to now calculate scores for these
-'''
-
-
-
-

@@ -1,4 +1,5 @@
 from enum import Enum
+import os
 
 class Board:
 
@@ -7,7 +8,8 @@ class Board:
 
     def __initialize_board(self):
         board = []
-        with open('../static/board.txt', 'r') as f:
+
+        with open(os.path.join(os.path.dirname(__file__), '../static/board.txt'), 'r') as f:
             for line in f:
                 board.append(list(map(lambda x: Board.Space(x), line.strip('\n').split(' '))))
         return board
@@ -21,7 +23,7 @@ class Board:
             row_representation = []
             for s in row:
                 if s.letter is not None:
-                    row_representation.append(' ' + s.letter + ' ')
+                    row_representation.append(' ' + s.letter.letter + ' ')
                 else:
                     row_representation.append(s.space_type)
             all_rows.append('{} {}'.format(str(i).zfill(3), ' '.join(row_representation)))

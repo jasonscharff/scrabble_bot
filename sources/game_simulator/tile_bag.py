@@ -9,6 +9,9 @@ class Tile:
     def __str__(self):
         return self.letter
 
+    def __eq__(self, other):
+        return self.letter == other.letter and self.point_value == other.point_value
+
 
 class TileBag:
 
