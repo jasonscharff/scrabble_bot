@@ -48,6 +48,9 @@ class GreedyPlayer(Player):
             )
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
+        self.score += points_earned
+        for letter in best_move[0]:
+            self.tiles.remove(letter)
 
 
     def find_horizontal_hooks(self, board):
@@ -140,6 +143,9 @@ class GreedyPlayer(Player):
 
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
+        self.score += points_earned
+        for letter in best_move[0]:
+            self.tiles.remove(letter)
 
     def __evaluate_moves(self, board, rack, hook_letter, hook_coordinates, prefix_length, suffix_length, direction):
         available_moves = []

@@ -13,14 +13,42 @@ def __initialize_dictionary():
     return g
 
 if __name__ == '__main__':
-    board = Board()
-    tile_bag = TileBag()
     g = __initialize_dictionary()
-    first_ai = GreedyPlayer(g)
-    second_ai = GreedyPlayer(g)
+    board = Board(g)
+    tile_bag = TileBag()
+    first_ai = AIPlayer(g)
+    second_ai = AIPlayer(g)
 
     first_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
     second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
 
     #need to finish the logic of actually playing
     first_ai.play_first(board)
+    first_ai.add_tiles(tile_bag.draw(7-len(first_ai.tiles)))
+    player2_move = True
+    player1_move = True
+    while True:
+        if not player1_move and not player2_move:
+            break
+        pre2 = len(second_ai.tiles)
+        second_ai.play(board)
+        post2 = len(second_ai.tiles)
+        if pre2 == post2:
+            player2_move = False
+        if len(tile_bag.tiles) == 0 and len(second_ai.tiles) == 0:
+            break
+        second_ai.add_tiles(tile_bag.draw(7 - len(second_ai.tiles)))
+
+        if not player1_move and not player2_move:
+            break
+        pre1 = len(first_ai.tiles)
+        first_ai.play(board)
+        post1 = len(second_ai.tiles)
+        if pre1 == post1:
+            player1_move = False
+        if len(tile_bag.tiles) == 0 and len(first_ai.tiles) == 0:
+            break
+        first_ai.add_tiles(tile_bag.draw(7 - len(first_ai.tiles)))
+
+
+
