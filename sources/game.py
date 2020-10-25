@@ -16,8 +16,8 @@ if __name__ == '__main__':
     g = __initialize_dictionary()
     board = Board(g)
     tile_bag = TileBag()
-    first_ai = AIPlayer(g)
-    second_ai = AIPlayer(g)
+    first_ai = GreedyPlayer(g)
+    second_ai = GreedyPlayer(g)
 
     first_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
     second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
