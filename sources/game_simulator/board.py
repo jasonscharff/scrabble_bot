@@ -50,7 +50,7 @@ class Board:
             multiplier = 1
             for i in range(len(word[0])):
                 space_type = self.board[coordinate[0]][coordinate[1]].space_type
-                value = self.board[coordinate[0]][coordinate[1]].letter.point_value
+                value = word[i].point_value
                 if space_type is Board.Space.SpaceType.DOUBLE_WORD:
                     multiplier *= 2
                 if space_type is Board.Space.SpaceType.TRIPLE_WORD:
