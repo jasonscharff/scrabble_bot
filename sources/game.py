@@ -22,7 +22,6 @@ if __name__ == '__main__':
     first_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
     second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
 
-    #need to finish the logic of actually playing
     first_ai.play_first(board)
     first_ai.add_tiles(tile_bag.draw(7-len(first_ai.tiles)))
     player2_move = True
@@ -39,6 +38,10 @@ if __name__ == '__main__':
             break
         second_ai.add_tiles(tile_bag.draw(7 - len(second_ai.tiles)))
 
+        print(board.board)
+        print('Player 1 Score: %d' % first_ai.score)
+        print('Player 1 Score: %d' % second_ai.score)
+
         if not player1_move and not player2_move:
             break
         pre1 = len(first_ai.tiles)
@@ -49,6 +52,13 @@ if __name__ == '__main__':
         if len(tile_bag.tiles) == 0 and len(first_ai.tiles) == 0:
             break
         first_ai.add_tiles(tile_bag.draw(7 - len(first_ai.tiles)))
+        print(board.board)
+        print('Player 1 Score: %d' % first_ai.score)
+        print('Player 1 Score: %d' % second_ai.score)
 
-
+    print('Final Results')
+    print(board.board)
+    print('Greedy Player 1 scored %d points.' % first_ai.score)
+    print('Greedy Player 2 scored %d points.' % second_ai.score)
+    print('The total points scored in the game was %d' % first_ai.score + second_ai.score)
 

@@ -38,6 +38,8 @@ class Board:
 
     def points_earned_for(self, word, starting_coordinate, direction):
         score = 0
+        if len(word == 7):
+            score += 50
         words = self.find_connected_words(word, starting_coordinate, direction)
         words.append([word, starting_coordinate, direction])
         for word in words:
