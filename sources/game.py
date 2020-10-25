@@ -2,12 +2,12 @@ from data_structures.gaddag import GADDAG
 from game_simulator.board import Board
 from game_simulator.tile_bag import TileBag
 from game_simulator.player import GreedyPlayer
-
+import os
 NUMBER_OF_TILES = 7
 
 def __initialize_dictionary():
     g = GADDAG()
-    with open('../static/scrabble_dictionary.txt', 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), './static/scrabble_dictionary.txt'), 'r') as f:
         for line in f:
             g.add_word(line.strip('\n'))
     return g
