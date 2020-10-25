@@ -40,7 +40,7 @@ class Board:
 
     def points_earned_for(self, word, starting_coordinate, direction):
         score = 0
-        if len(word == 7):
+        if len(word) == 7:
             score += 50
         words = self.find_connected_words(word, starting_coordinate, direction)
         words.append([word, starting_coordinate, direction])
@@ -70,7 +70,7 @@ class Board:
 
     def find_connected_words(self, word, starting_coordinate, direction):
         # cc - abreviation of current coordinate
-        cc = starting_coordinate
+        cc = [x for x in starting_coordinate]
         words = []
         word_index = 0
         if direction is Board.Direction.HORIZONTAL:
