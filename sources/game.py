@@ -14,8 +14,8 @@ def __initialize_dictionary():
 
 if __name__ == '__main__':
     g = __initialize_dictionary()
-    board = Board(g)
     tile_bag = TileBag()
+    board = Board(g, tile_bag.map)
     first_ai = GreedyPlayer(g)
     second_ai = GreedyPlayer(g)
 
@@ -24,6 +24,11 @@ if __name__ == '__main__':
 
     first_ai.play_first(board)
     first_ai.add_tiles(tile_bag.draw(7-len(first_ai.tiles)))
+
+    print(board)
+    print('Player 1 Score: %d' % first_ai.score)
+    print('Player 2 Score: %d' % second_ai.score)
+
     player2_move = True
     player1_move = True
     while True:
@@ -40,7 +45,7 @@ if __name__ == '__main__':
 
         print(board.board)
         print('Player 1 Score: %d' % first_ai.score)
-        print('Player 1 Score: %d' % second_ai.score)
+        print('Player 2 Score: %d' % second_ai.score)
 
         if not player1_move and not player2_move:
             break
@@ -54,7 +59,7 @@ if __name__ == '__main__':
         first_ai.add_tiles(tile_bag.draw(7 - len(first_ai.tiles)))
         print(board.board)
         print('Player 1 Score: %d' % first_ai.score)
-        print('Player 1 Score: %d' % second_ai.score)
+        print('Player 2 Score: %d' % second_ai.score)
 
     print('Final Results')
     print(board.board)
