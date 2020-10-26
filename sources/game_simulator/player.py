@@ -33,7 +33,7 @@ class GreedyPlayer(Player):
         for prefix, suffix in options:
             word = prefix + suffix
             vertical_move = (word, (middle_spot, middle_spot - len(prefix)), Board.Direction.VERTICAL)
-            horizontal_move = (word, (middle_spot - len(prefix)), Board.Direction.HORIZONTAL)
+            horizontal_move = (word, (middle_spot - len(prefix), middle_spot), Board.Direction.HORIZONTAL)
             available_moves.append(
                 (
                     vertical_move,
@@ -49,8 +49,12 @@ class GreedyPlayer(Player):
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
         self.score += points_earned
+        print('word played: %s' % best_move[0])
         for letter in best_move[0]:
-            self.tiles.remove(letter)
+            for tile in self.tiles:
+                if tile.letter == letter:
+                    self.tiles.remove(tile)
+                    break
 
 
     def find_horizontal_hooks(self, board):
@@ -116,8 +120,7 @@ class GreedyPlayer(Player):
         available_horizontal_moves = self.find_horizontal_hooks(board)
         available_vertical_moves = self.find_vertical_hooks(board)
         for hook_coordinates, hook_letter, prefix_count, suffix_count in available_horizontal_moves:
-            available_moves.append(
-                self.__evaluate_moves(
+            horizontal_moves = self.__evaluate_moves(
                     board=board,
                     rack=rack,
                     hook_letter=hook_letter,
@@ -126,11 +129,11 @@ class GreedyPlayer(Player):
                     suffix_length=suffix_count,
                     direction=Board.Direction.HORIZONTAL
                 )
-            )
+            if len(horizontal_moves) > 0:
+                available_moves += horizontal_moves
 
         for hook_coordinates, hook_letter, prefix_count, suffix_count in available_vertical_moves:
-            available_moves.append(
-                self.__evaluate_moves(
+            vertical_moves = self.__evaluate_moves(
                     board=board,
                     rack=rack,
                     hook_letter=hook_letter,
@@ -139,13 +142,18 @@ class GreedyPlayer(Player):
                     suffix_length=suffix_count,
                     direction=Board.Direction.VERTICAL
                 )
-            )
+            if len(vertical_moves) > 0:
+                available_moves += vertical_moves
 
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
         self.score += points_earned
+        print('word played: %s' % best_move[0])
         for letter in best_move[0]:
-            self.tiles.remove(letter)
+            for tile in self.tiles:
+                if tile.letter == letter:
+                    self.tiles.remove(tile)
+                    break
 
     def __evaluate_moves(self, board, rack, hook_letter, hook_coordinates, prefix_length, suffix_length, direction):
         available_moves = []

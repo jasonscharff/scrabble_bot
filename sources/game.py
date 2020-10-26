@@ -2,20 +2,20 @@ from data_structures.gaddag import GADDAG
 from game_simulator.board import Board
 from game_simulator.tile_bag import TileBag
 from game_simulator.player import GreedyPlayer
-
+import os
 NUMBER_OF_TILES = 7
 
 def __initialize_dictionary():
     g = GADDAG()
-    with open('../static/scrabble_dictionary.txt', 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), './static/scrabble_dictionary.txt'), 'r') as f:
         for line in f:
             g.add_word(line.strip('\n'))
     return g
 
 if __name__ == '__main__':
     g = __initialize_dictionary()
-    board = Board(g)
     tile_bag = TileBag()
+    board = Board(g, tile_bag.map)
     first_ai = GreedyPlayer(g)
     second_ai = GreedyPlayer(g)
 
@@ -23,7 +23,12 @@ if __name__ == '__main__':
     second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
 
     first_ai.play_first(board)
-    first_ai.add_tiles(tile_bag.draw(7-len(first_ai.tiles)))
+    first_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES-len(first_ai.tiles)))
+
+    print(board)
+    print('Player 1 Score: %d' % first_ai.score)
+    print('Player 2 Score: %d' % second_ai.score)
+
     player2_move = True
     player1_move = True
     while True:
@@ -36,11 +41,11 @@ if __name__ == '__main__':
             player2_move = False
         if len(tile_bag.tiles) == 0 and len(second_ai.tiles) == 0:
             break
-        second_ai.add_tiles(tile_bag.draw(7 - len(second_ai.tiles)))
+        second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES - len(second_ai.tiles)))
 
         print(board.board)
         print('Player 1 Score: %d' % first_ai.score)
-        print('Player 1 Score: %d' % second_ai.score)
+        print('Player 2 Score: %d' % second_ai.score)
 
         if not player1_move and not player2_move:
             break
@@ -54,7 +59,7 @@ if __name__ == '__main__':
         first_ai.add_tiles(tile_bag.draw(7 - len(first_ai.tiles)))
         print(board.board)
         print('Player 1 Score: %d' % first_ai.score)
-        print('Player 1 Score: %d' % second_ai.score)
+        print('Player 2 Score: %d' % second_ai.score)
 
     print('Final Results')
     print(board.board)

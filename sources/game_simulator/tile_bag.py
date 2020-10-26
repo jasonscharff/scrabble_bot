@@ -1,4 +1,5 @@
 import random
+import os
 
 class Tile:
 
@@ -17,13 +18,14 @@ class TileBag:
 
     def __init__(self):
         self.tiles = self.__generate_tiles()
+        self.map = self.__make_map()
 
     def draw(self, number):
         return [self.tiles.pop() for _ in range(number)]
 
     def __generate_tiles(self):
         all_tiles = []
-        with open('../static/tiles.txt', 'r') as f:
+        with open(os.path.join(os.path.dirname(__file__), '../static/tiles.txt'), 'r') as f:
             for line in f:
                 count, letter, value = line.strip('\n').split(' ')
                 all_tiles += [Tile(letter, int(value)) for _ in range(int(count))]
@@ -31,3 +33,10 @@ class TileBag:
         random.shuffle(all_tiles)
         return all_tiles
 
+    def __make_map(self):
+        letter_point_map = {}
+        with open(os.path.join(os.path.dirname(__file__), '../static/tiles.txt'), 'r') as f:
+            for line in f:
+                count, letter, value = line.strip('\n').split(' ')
+                letter_point_map[letter] = int(value)
+        return letter_point_map
