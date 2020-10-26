@@ -46,7 +46,6 @@ class GreedyPlayer(Player):
                     board.points_earned_for(horizontal_move[0], horizontal_move[1], horizontal_move[2])
                  )
             )
-        print(available_moves)
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
         self.score += points_earned
@@ -145,7 +144,6 @@ class GreedyPlayer(Player):
                     direction=Board.Direction.VERTICAL
                 )
             )
-        print(available_moves)
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
         self.score += points_earned
