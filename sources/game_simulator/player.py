@@ -120,8 +120,7 @@ class GreedyPlayer(Player):
         available_horizontal_moves = self.find_horizontal_hooks(board)
         available_vertical_moves = self.find_vertical_hooks(board)
         for hook_coordinates, hook_letter, prefix_count, suffix_count in available_horizontal_moves:
-            available_moves.append(
-                self.__evaluate_moves(
+            horizontal_moves = self.__evaluate_moves(
                     board=board,
                     rack=rack,
                     hook_letter=hook_letter,
@@ -130,11 +129,11 @@ class GreedyPlayer(Player):
                     suffix_length=suffix_count,
                     direction=Board.Direction.HORIZONTAL
                 )
-            )
+            if len(horizontal_moves) > 0:
+                available_moves += horizontal_moves
 
         for hook_coordinates, hook_letter, prefix_count, suffix_count in available_vertical_moves:
-            available_moves.append(
-                self.__evaluate_moves(
+            vertical_moves = self.__evaluate_moves(
                     board=board,
                     rack=rack,
                     hook_letter=hook_letter,
@@ -143,7 +142,9 @@ class GreedyPlayer(Player):
                     suffix_length=suffix_count,
                     direction=Board.Direction.VERTICAL
                 )
-            )
+            if len(vertical_moves) > 0:
+                available_moves += vertical_moves
+
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
         self.score += points_earned

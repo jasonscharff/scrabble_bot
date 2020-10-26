@@ -23,7 +23,7 @@ if __name__ == '__main__':
     second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES))
 
     first_ai.play_first(board)
-    first_ai.add_tiles(tile_bag.draw(7-len(first_ai.tiles)))
+    first_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES-len(first_ai.tiles)))
 
     print(board)
     print('Player 1 Score: %d' % first_ai.score)
@@ -41,7 +41,7 @@ if __name__ == '__main__':
             player2_move = False
         if len(tile_bag.tiles) == 0 and len(second_ai.tiles) == 0:
             break
-        second_ai.add_tiles(tile_bag.draw(7 - len(second_ai.tiles)))
+        second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES - len(second_ai.tiles)))
 
         print(board.board)
         print('Player 1 Score: %d' % first_ai.score)

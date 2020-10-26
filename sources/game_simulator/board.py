@@ -25,7 +25,7 @@ class Board:
             row_representation = []
             for s in row:
                 if s.letter is not None:
-                    row_representation.append(' ' + s.letter.letter + ' ')
+                    row_representation.append(' ' + s.letter + ' ')
                 else:
                     row_representation.append(s.space_type)
             all_rows.append('{} {}'.format(str(i).zfill(3), ' '.join(row_representation)))
@@ -45,6 +45,7 @@ class Board:
         words.append((word, starting_coordinate, direction))
         for word in words:
             word_score = 0
+            print(word)
             coordinate = list(word[1])
             multiplier = 1
             for i in range(len(word[0])):
