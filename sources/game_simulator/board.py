@@ -32,9 +32,73 @@ class Board:
         return '\n'.join(all_rows)
 
     def is_valid_play(self, word, starting_coordinate, direction):
-        words = self.find_connected_words(word, starting_coordinate, direction)
+        # words = self.find_connected_words(word, starting_coordinate, direction)
+        print(word)
+        words = []
+        dont_remove = set()
+        # add to board
+        cc = list(starting_coordinate)
+        for i in range(len(word)):
+            if self.board[cc[0]][cc[1]].letter is None:
+                self.board[cc[0]][cc[1]].letter = word[i]
+            else:
+                dont_remove.add((cc[0], cc[1]))
+            if direction is Board.Direction.HORIZONTAL:
+                cc[1] += 1
+            else:
+                cc[0] += 1
+        # check if board is valid
+        # scan rows
+        for i in range(15):
+            w = ''
+            for j in range(15):
+                if self.board[i][j].letter is not None:
+                    w += self.board[i][j].letter
+                if self.board[i][j].letter is None:
+                    if len(w) > 1:
+                        words.append(w)
+                        w = ''
+                    else:
+                        continue
+            if len(w) > 1:
+                words.append(w)
+        # scan columns
+        for i in range(15):
+            w = ''
+            for j in range(15):
+                if self.board[j][i].letter is not None:
+                    w += self.board[j][i].letter
+                if self.board[j][i].letter is None:
+                    if len(w) > 1:
+                        words.append(w)
+                        w = ''
+                    else:
+                        continue
+            if len(w) > 1:
+                words.append(w)
+        # remove word from board
+        cc = list(starting_coordinate)
+        for i in range(len(word)):
+            if (cc[0], cc[1]) in dont_remove:
+                if direction is Board.Direction.HORIZONTAL:
+                    cc[1] += 1
+                else:
+                    cc[0] += 1
+                continue
+            else:
+                self.board[cc[0]][cc[1]].letter = None
+            if direction is Board.Direction.HORIZONTAL:
+                cc[1] += 1
+            else:
+                cc[0] += 1
+        print(self)
+        print('words variable:')
+        print(words)
         for word in words:
-            valid = word[0] in self.scrabble_dictionary
+            print(word)
+            print(type(word))
+            valid = word in self.scrabble_dictionary
+            print(valid)
             if not valid:
                 return False
         return True
@@ -45,7 +109,6 @@ class Board:
         words.append((word, starting_coordinate, direction))
         for word in words:
             word_score = 0
-            print(word)
             coordinate = list(word[1])
             multiplier = 1
             for i in range(len(word[0])):
@@ -127,6 +190,7 @@ class Board:
                 words.extend(self.find_words(word, word_index, [cc[0]+1, cc[1]]))
         s = set(words)
         words = list(s)
+        print(words)
         return words
 
     def find_words(self, word, word_index, starting_coordinate):

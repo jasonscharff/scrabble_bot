@@ -132,7 +132,7 @@ class GADDAGTests(unittest.TestCase):
 
         matches = g.find_matches(hook='A', rack=['P', 'P', 'L', 'E'], available_prefix_spaces=10, available_suffix_spaces=10)
         self.assertTrue(('', 'PPLE') in matches)
-
+        self.assertTrue('HAPPY' in g)
 
 if __name__ == '__main__':
     unittest.main()
