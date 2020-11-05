@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     print(board)
     print('Player 1 Score: %d' % first_ai.score)
-    print('Player 2 Score: %d' % second_ai.score)
+    print('Player 2 Score: %d\n' % second_ai.score)
 
     player2_move = True
     player1_move = True
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
         print(board)
         print('Player 1 Score: %d' % first_ai.score)
-        print('Player 2 Score: %d' % second_ai.score)
+        print('Player 2 Score: %d\n' % second_ai.score)
 
         if not player1_move and not player2_move:
             break
@@ -59,11 +59,12 @@ if __name__ == '__main__':
         first_ai.add_tiles(tile_bag.draw(7 - len(first_ai.tiles)))
         print(board)
         print('Player 1 Score: %d' % first_ai.score)
-        print('Player 2 Score: %d' % second_ai.score)
+        print('Player 2 Score: %d\n' % second_ai.score)
 
-    print('Final Results')
     print(board)
+    print('Final Results')
     print('Greedy Player 1 scored %d points.' % first_ai.score)
     print('Greedy Player 2 scored %d points.' % second_ai.score)
-    print('The total points scored in the game was %d' % first_ai.score + second_ai.score)
+    total_score = first_ai.score + second_ai.score
+    print('The total points scored in the game was %d' % total_score)
 

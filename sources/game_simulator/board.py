@@ -7,6 +7,7 @@ class Board:
         self.board = self.__initialize_board()
         self.scrabble_dictionary = scrabble_dictionary
         self.point_map = point_map
+        self.played_words = set()
 
     def __initialize_board(self):
         board = []
@@ -33,7 +34,6 @@ class Board:
 
     def is_valid_play(self, word, starting_coordinate, direction):
         # words = self.find_connected_words(word, starting_coordinate, direction)
-        print(word)
         words = []
         dont_remove = set()
         # add to board
@@ -91,137 +91,96 @@ class Board:
                 cc[1] += 1
             else:
                 cc[0] += 1
-        print(self)
-        print('words variable:')
-        print(words)
         for word in words:
-            print(word)
-            print(type(word))
             valid = word in self.scrabble_dictionary
-            print(valid)
             if not valid:
                 return False
         return True
 
     def points_earned_for(self, word, starting_coordinate, direction):
         score = 0
+        if len(word) == 7:
+            score += 50
         words = self.find_connected_words(word, starting_coordinate, direction)
         words.append((word, starting_coordinate, direction))
         for word in words:
+            if word in self.played_words:
+                continue
             word_score = 0
             coordinate = list(word[1])
             multiplier = 1
             for i in range(len(word[0])):
+                # print(coordinate, word[0][i])
                 space_type = self.board[coordinate[0]][coordinate[1]].space_type
                 value = self.point_map[word[0][i]]
-                if space_type is Board.Space.SpaceType.DOUBLE_WORD:
+                if space_type == '2WS':
                     multiplier *= 2
-                if space_type is Board.Space.SpaceType.TRIPLE_WORD:
+                if space_type == '3WS':
                     multiplier *= 3
-                if space_type is Board.Space.SpaceType.DOUBLE_LETTER:
+                if space_type == '2LS':
                     value *= 2
-                if space_type is Board.Space.SpaceType.TRIPLE_LETTER:
+                if space_type == '3LS':
                     value *= 3
                 word_score += value
-                if direction == Board.Direction.HORIZONTAL:
+                # print(word[0][i], value, space_type, type(space_type))
+                if word[2] == Board.Direction.HORIZONTAL:
                     coordinate[1] += 1
                 else:
                     coordinate[0] += 1
             word_score *= multiplier
+            # print(word, word_score)
             score += word_score
-        if len(word) == 7:
-            score += 50
         return score
 
     def find_connected_words(self, word, starting_coordinate, direction):
         # cc - abreviation of current coordinate
         cc = list(starting_coordinate)
         words = []
-        word_index = 0
         if direction is Board.Direction.HORIZONTAL:
-            # check 3 spaces around first letter left, up, down
-            if cc[0] < 14 and self.board[cc[0]+1][cc[1]].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0]+1, cc[1]]))
-            if cc[0] > 0 and self.board[cc[0]-1][cc[1]].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0]-1, cc[1]]))
-            if cc[1] > 0 and self.board[cc[0]][cc[1]-1].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0], cc[1]-1]))
-            cc[1] += 1
-            word_index += 1
-            for i in range(1, len(word) - 1):
-                # check 2 spaces around middle letters up, down
-                if cc[0] < 14 and self.board[cc[0]+1][cc[1]].letter is not None:
-                    words.extend(self.find_words(word, word_index, [cc[0]+1, cc[1]]))
-                if cc[0] > 0 and self.board[cc[0]-1][cc[1]].letter is not None:
-                    words.extend(self.find_words(word, word_index, [cc[0]-1, cc[1]]))
-                cc[1] += 1
-                word_index += 1
-            # check 3 spaces around last letter right, up, down
-            if cc[0] < 14 and self.board[cc[0]+1][cc[1]].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0]+1, cc[1]]))
-            if cc[0] > 0 and self.board[cc[0]-1][cc[1]].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0]-1, cc[1]]))
-            if cc[1] < 14 and self.board[cc[0]][cc[1]+1].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0], cc[1]+1]))
+            for i in range(len(word)):
+                c = [cc[0], cc[1]+i]
+                w = word[i]
+                start_coor = c
+                for j in range(1, 15 - c[1]):
+                    if c[0]+j == 15:
+                        break
+                    if self.board[c[0]+j][c[1]].letter is None:
+                        break
+                    else:
+                        w += self.board[c[0]+j][c[1]].letter
+                for k in range(1, c[1]):
+                    if c[0]-k == 15:
+                        break
+                    if self.board[c[0]-k][c[1]].letter is None:
+                        break
+                    else:
+                        w = self.board[c[0]-k][c[1]].letter + w
+                        start_coor = [c[0]-k, c[1]]
+                if len(w) > 1:
+                    words.append((w, (start_coor[0], start_coor[1]), Board.Direction.VERTICAL))
         else:
-            # check 3 spaces around first letter up, left, right
-            if cc[1] < 14 and self.board[cc[0]][cc[1]+1].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0], cc[1]+1]))
-            if cc[1] > 0 and self.board[cc[0]][cc[1]-1].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0], cc[1]-1]))
-            if cc[0] > 0 and self.board[cc[0]-1][cc[1]].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0]-1, cc[1]]))
-            cc[0] += 1
-            word_index += 1
-            for i in range(1, len(word) - 1):
-                # check 2 spaces around middle letters left, right
-                if cc[1] < 14 and self.board[cc[0]][cc[1]+1].letter is not None:
-                    words.extend(self.find_words(word, word_index, [cc[0], cc[1]+1]))
-                if cc[1] > 0 and self.board[cc[0]][cc[1]-1].letter is not None:
-                    words.extend(self.find_words(word, word_index, [cc[0], cc[1]-1]))
-                cc[0] += 1
-                word_index += 1
-            # check 3 spaces around last letter down, right, left
-            if cc[1] < 14 and self.board[cc[0]][cc[1]+1].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0], cc[1]+1]))
-            if cc[1] > 0 and self.board[cc[0]][cc[1]-1].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0], cc[1]-1]))
-            if cc[0] < 14 and self.board[cc[0]+1][cc[1]].letter is not None:
-                words.extend(self.find_words(word, word_index, [cc[0]+1, cc[1]]))
-        s = set(words)
-        words = list(s)
-        print(words)
+            for i in range(len(word)):
+                c = [cc[0]+i, cc[1]]
+                w = word[i]
+                start_coor = c
+                for j in range(1, 15 - c[1]):
+                    if c[1]+j == 15:
+                        break
+                    if self.board[c[0]][c[1] + j].letter is None:
+                        break
+                    else:
+                        w += self.board[c[0]][c[1] + j].letter
+                for k in range(1, c[0]):
+                    if c[1]-k == 15:
+                        break
+                    if self.board[c[0]][c[1] - k].letter is None:
+                        break
+                    else:
+                        w = self.board[c[0]][c[1] - k].letter + w
+                        start_coor = [c[0], c[1] - k]
+                if len(w) > 1:
+                    words.append((w, (start_coor[0], start_coor[1]), Board.Direction.HORIZONTAL))
         return words
-
-    def find_words(self, word, word_index, starting_coordinate):
-        cc = list(starting_coordinate)
-        vertical = word[word_index]
-        horizontal = word[word_index]
-        vertical_start = []
-        horizontal_start = []
-        while self.board[cc[0]+1][cc[1]].letter:
-            vertical = self.board[cc[0]+1][cc[1]].letter + vertical
-            cc[0] += 1
-        cc = starting_coordinate
-        while self.board[cc[0]-1][cc[1]].letter:
-            vertical = vertical + self.board[cc[0]-1][cc[1]].letter
-            cc[0] -= 1
-            vertical_start = cc
-        cc = starting_coordinate
-        while self.board[cc[0]][cc[1]+1].letter:
-            horizontal = horizontal + self.board[cc[0]][cc[1]+1].letter
-            cc[1] += 1
-        cc = starting_coordinate
-        while self.board[cc[0]][cc[1]-1].letter:
-            horizontal = self.board[cc[0]][cc[1]-1].letter + horizontal
-            cc[0] -= 1
-            horizontal_start = cc
-        ret = []
-        if len(vertical) > 1:
-            ret.append((vertical, tuple(vertical_start), 0))
-        if len(horizontal) > 1:
-            ret.append((horizontal, tuple(horizontal_start), 1))
-        return ret
 
     def play(self, word, starting_coordinate, direction):
         # just add word to board
@@ -233,6 +192,11 @@ class Board:
                 cc[1] += 1
             else:
                 cc[0] += 1
+        words = self.find_connected_words(word, starting_coordinate, direction)
+        words.append((word, starting_coordinate, direction))
+        for w in words:
+            self.played_words.add(w)
+
 
     class Direction(Enum):
         HORIZONTAL = 0

@@ -21,7 +21,7 @@ class GreedyPlayer(Player):
 
 
     def play_first(self, board):
-        middle_spot = len(board.board) // 2 + 1
+        middle_spot = len(board.board) // 2
         rack = list(map(lambda x: x.letter, self.tiles))
         options = self.scrabble_dictionary.find_matches(
             hook=None,
@@ -32,8 +32,8 @@ class GreedyPlayer(Player):
         available_moves = []
         for prefix, suffix in options:
             word = prefix + suffix
-            vertical_move = (word, (middle_spot, middle_spot - len(prefix)), Board.Direction.VERTICAL)
-            horizontal_move = (word, (middle_spot - len(prefix), middle_spot), Board.Direction.HORIZONTAL)
+            vertical_move = (word, (middle_spot - len(prefix), middle_spot), Board.Direction.VERTICAL)
+            horizontal_move = (word, (middle_spot, middle_spot - len(prefix)), Board.Direction.HORIZONTAL)
             available_moves.append(
                 (
                     vertical_move,
@@ -144,7 +144,8 @@ class GreedyPlayer(Player):
                 )
             if len(vertical_moves) > 0:
                 available_moves += vertical_moves
-
+        if len(available_moves) == 0:
+            return
         best_move, points_earned = max(available_moves, key=lambda x: x[1])
         board.play(best_move[0], best_move[1], best_move[2])
         self.score += points_earned
