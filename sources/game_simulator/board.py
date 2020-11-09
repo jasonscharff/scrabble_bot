@@ -1,5 +1,6 @@
 from enum import Enum
 import os
+import copy
 
 class Board:
 
@@ -16,9 +17,12 @@ class Board:
             for line in f:
                 board.append(list(map(lambda x: Board.Space(x), line.strip('\n').split(' '))))
         return board
-    
-    def __copy__(self):
-        return Board(self.scrabble_dictionary, self.point_map)
+
+    def __deepcopy__(self, memodict={}):
+        new_board = Board(self.scrabble_dictionary, self.point_map)
+        new_board.board = copy.deepcopy(self.board)
+        new_board.played_words = self.played_words.copy()
+        return new_board
 
     def __str__(self):
         all_rows = []
@@ -217,4 +221,7 @@ class Board:
         def __init__(self, space_type=SpaceType.REGULAR, letter=None):
             self.space_type = space_type
             self.letter = letter
+
+        def __copy__(self):
+            return Board.Space(space_type=self.space_type, letter=self.letter)
 
