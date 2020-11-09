@@ -16,6 +16,9 @@ class Board:
             for line in f:
                 board.append(list(map(lambda x: Board.Space(x), line.strip('\n').split(' '))))
         return board
+    
+    def __copy__(self):
+        return Board(self.scrabble_dictionary, self.point_map)
 
     def __str__(self):
         all_rows = []
