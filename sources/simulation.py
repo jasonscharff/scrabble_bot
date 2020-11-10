@@ -71,8 +71,8 @@ if __name__ == '__main__':
     win_counts = {}
 
     players = ['greedy child', 'greedy expert', 'greedy scrabble',
-               'random child', 'random expert', 'random scrabble']#,
-               # 'All-knowing child', 'All-knowing expert', 'All-knowing scrabble']
+               'random child', 'random expert', 'random scrabble',
+                'All-knowing child', 'All-knowing expert', 'All-knowing scrabble']
     completed = set()
 
     scrabble = __initialize_dictionary('./static/scrabble_dictionary.txt')
@@ -84,6 +84,7 @@ if __name__ == '__main__':
 
     for i in range(len(players)):
         for j in range(len(players)):
+            print("Matchup: {} {}".format(i, j))
             p1 = players[i]
             p2 = players[j]
             if p1 == p2:
@@ -97,7 +98,7 @@ if __name__ == '__main__':
             key2 = p2+' vs '+p1
             win_counts[key1] = 0
             win_counts[key2] = 0
-            for _ in range(20):
+            for _ in range(100):
                 # create player 1
                 if p1.split(' ')[0] == 'greedy':
                     if p1.split(' ')[1] == 'child':
