@@ -39,6 +39,8 @@ if __name__ == '__main__':
         post2 = len(second_ai.tiles)
         if pre2 == post2:
             player2_move = False
+        else:
+            player2_move = True
         if len(tile_bag.tiles) == 0 and len(second_ai.tiles) == 0:
             break
         second_ai.add_tiles(tile_bag.draw(NUMBER_OF_TILES - len(second_ai.tiles)))
@@ -51,9 +53,11 @@ if __name__ == '__main__':
             break
         pre1 = len(first_ai.tiles)
         first_ai.play(board)
-        post1 = len(second_ai.tiles)
+        post1 = len(first_ai.tiles)
         if pre1 == post1:
             player1_move = False
+        else:
+            player1_move = True
         if len(tile_bag.tiles) == 0 and len(first_ai.tiles) == 0:
             break
         first_ai.add_tiles(tile_bag.draw(7 - len(first_ai.tiles)))
