@@ -66,12 +66,8 @@ def game(dictionary, first_ai, second_ai, first, second):
     else:
         return second
 
+
 if __name__ == '__main__':
-    # score_matrix = [[0, 0, 0, 0, 0, 0] for _ in range(6)]
-    # for i in range(6):
-    #     for j in range(6):
-    #         if i == j:
-    #             score_matrix[i][j] = 'NA'
     win_counts = {}
 
     players = ['greedy child', 'greedy expert', 'greedy scrabble',
